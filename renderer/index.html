@@ -14,19 +14,19 @@
         <span id="ac-plan" class="plan-badge" hidden></span>
       </div>
       <div id="controls">
-        <button id="gear" title="Settings">⚙</button>
-        <button id="usage" title="Open Usage page">
+        <button id="gear" data-i18n-title="settingsTitle" title="Settings">⚙</button>
+        <button id="usage" data-i18n-title="openUsageTitle" title="Open Usage page">
           <svg viewBox="0 0 24 24" width="9" height="9" aria-hidden="true">
             <path d="M6 18 L18 6 M10 6 H18 V14" />
           </svg>
         </button>
-        <button id="min" title="Minimize / expand">
+        <button id="min" data-i18n-title="minimizeTitle" title="Minimize / expand">
           <span class="ic-min">–</span>
           <svg class="ic-max" viewBox="0 0 24 24" aria-hidden="true">
             <path d="M5 9V5h4 M15 5h4v4 M5 15v4h4 M19 15v4h-4" />
           </svg>
         </button>
-        <button id="close" title="Close">×</button>
+        <button id="close" data-i18n-title="closeTitle" title="Close">×</button>
       </div>
 
       <!-- Claude pixel pet -->
@@ -221,8 +221,8 @@
           <span id="mini-acct-name"></span>
           <span id="mini-acct-plan" class="plan-badge" hidden></span>
         </div>
-        <div class="mini-line"><span id="mini-dot"></span><span id="mini-text">idle</span></div>
-        <div id="mini-pct-row"><span id="mini-pct">0%</span> <span class="lbl">session</span></div>
+        <div class="mini-line"><span id="mini-dot"></span><span id="mini-text" data-i18n="stIdle">idle</span></div>
+        <div id="mini-pct-row"><span id="mini-pct">0%</span> <span class="lbl" data-i18n="miniSessionLabel">session</span></div>
       </div>
 
       <!-- collapsible content -->
@@ -230,11 +230,11 @@
         <!-- status -->
         <div id="statusline">
           <span id="status-dot"></span>
-          <span id="status-text">idle</span>
+          <span id="status-text" data-i18n="stIdle">idle</span>
           <span class="sep">·</span>
           <span id="rate">—</span>
           <span class="sep live-only">·</span>
-          <span id="live-tag" class="live-only">live</span>
+          <span id="live-tag" class="live-only" data-i18n="liveTag">live</span>
         </div>
 
         <div class="divider"></div>
@@ -243,12 +243,12 @@
         <div id="limits">
           <div id="limits-meters">
             <div class="meter">
-              <div class="meter-top"><span>current session</span><span id="session-pct">0%</span></div>
+              <div class="meter-top"><span data-i18n="currentSession">current session</span><span id="session-pct">0%</span></div>
               <div class="track"><div class="fill" id="session-fill"></div></div>
-              <div class="sub" id="session-sub">no active session</div>
+              <div class="sub" id="session-sub" data-i18n="noActiveSession">no active session</div>
             </div>
             <div class="meter">
-              <div class="meter-top"><span>weekly · all models</span><span id="week-pct">0%</span></div>
+              <div class="meter-top"><span data-i18n="weeklyAllModels">weekly · all models</span><span id="week-pct">0%</span></div>
               <div class="track"><div class="fill week" id="week-fill"></div></div>
               <div class="sub" id="week-sub">—</div>
             </div>
@@ -258,8 +258,8 @@
               <path d="M9 12h6 M8.5 8.5H6.5a3.5 3.5 0 0 0 0 7h2 M15.5 8.5h2a3.5 3.5 0 0 1 0 7h-2" />
             </svg>
             <span class="lc-text">
-              <b>Connect your account</b>
-              <i>to see your real usage</i>
+              <b data-i18n="connectAccount">Connect your account</b>
+              <i data-i18n="toSeeRealUsage">to see your real usage</i>
             </span>
           </button>
         </div>
@@ -268,7 +268,7 @@
 
         <!-- by model (7 days) -->
         <div id="bymodel">
-          <div class="bymodel-title">by model · 7 days</div>
+          <div class="bymodel-title" data-i18n="byModel7Days">by model · 7 days</div>
           <div id="bymodel-list"></div>
         </div>
 
@@ -278,7 +278,7 @@
         <div id="heat">
           <div id="heat-row"></div>
           <div id="heat-meta">
-            <span>30 days</span>
+            <span data-i18n="days30">30 days</span>
             <span id="month-total">0</span>
           </div>
         </div>
@@ -286,41 +286,49 @@
 
       <!-- settings panel -->
       <div id="settings">
-        <div class="set-title">Settings</div>
+        <div class="set-title" data-i18n="settingsTitleLabel">Settings</div>
 
         <div id="account">
           <div id="acc-disconnected">
-            <div class="set-hint">Connect your account to show your real usage %.</div>
-            <button id="acc-connect" class="acc-btn">Log in with browser</button>
+            <div class="set-hint" data-i18n="connectHint">Connect your account to show your real usage %.</div>
+            <button id="acc-connect" class="acc-btn" data-i18n="logInWithBrowser">Log in with browser</button>
             <div id="acc-paste">
-              <div class="set-hint">After logging in, paste the code from the browser page:</div>
-              <input id="acc-code" type="text" placeholder="authentication code" />
-              <button id="acc-confirm" class="acc-btn">Connect</button>
+              <div class="set-hint" data-i18n="pasteCodeHint">After logging in, paste the code from the browser page:</div>
+              <input id="acc-code" type="text" data-i18n-placeholder="authCodePlaceholder" placeholder="authentication code" />
+              <button id="acc-confirm" class="acc-btn" data-i18n="connectBtn">Connect</button>
               <div id="acc-msg"></div>
             </div>
           </div>
           <div id="acc-connected">
-            <span class="acc-ok">● Connected · live data</span>
-            <button id="acc-logout" class="acc-link">Disconnect</button>
+            <span class="acc-ok" data-i18n="connectedLive">● Connected · live data</span>
+            <button id="acc-logout" class="acc-link" data-i18n="disconnect">Disconnect</button>
           </div>
         </div>
 
         <div class="set-section">
-          <div class="set-sec-title">Display</div>
+          <div class="set-sec-title" data-i18n="display">Display</div>
           <span class="seg" id="set-mode">
-            <button type="button" class="seg-btn" data-mode="floating">Floating pet</button>
-            <button type="button" class="seg-btn" data-mode="menubar">Menu bar</button>
+            <button type="button" class="seg-btn" data-mode="floating" data-i18n="floatingPet">Floating pet</button>
+            <button type="button" class="seg-btn" data-mode="menubar" data-i18n="menuBar">Menu bar</button>
+          </span>
+        </div>
+
+        <div class="set-section">
+          <div class="set-sec-title" data-i18n="language">Language</div>
+          <span class="seg" id="set-lang">
+            <button type="button" class="seg-btn" data-lang="en" data-i18n="langEnglish">English</button>
+            <button type="button" class="seg-btn" data-lang="pt" data-i18n="langPortuguese">Português</button>
           </span>
         </div>
 
         <div class="set-section">
           <div class="set-sec-title">
-            Alerts
+            <span data-i18n="alerts">Alerts</span>
             <input id="set-alerts" class="set-toggle" type="checkbox" aria-label="Enable alerts" />
           </div>
           <div class="set-thresholds">
             <span class="thr">
-              <span class="thr-cap">heads-up</span>
+              <span class="thr-cap" data-i18n="headsUp">heads-up</span>
               <span class="num">
                 <input id="set-t1" type="number" min="1" max="100" />
                 <span class="num-spin">
@@ -330,7 +338,7 @@
               </span>
             </span>
             <span class="thr">
-              <span class="thr-cap">near limit</span>
+              <span class="thr-cap" data-i18n="nearLimit">near limit</span>
               <span class="num">
                 <input id="set-t2" type="number" min="1" max="100" />
                 <span class="num-spin">
@@ -343,10 +351,10 @@
         </div>
 
         <div class="set-section">
-          <div class="set-sec-title">Catch fire</div>
+          <div class="set-sec-title" data-i18n="catchFire">Catch fire</div>
           <div class="set-thresholds">
             <span class="thr">
-              <span class="thr-cap">session %</span>
+              <span class="thr-cap" data-i18n="sessionPercent">session %</span>
               <span class="num">
                 <input id="set-fire" type="number" min="1" max="99" />
                 <span class="num-spin">
@@ -359,20 +367,21 @@
         </div>
 
         <div class="set-actions">
-          <button id="set-cancel">Cancel</button>
-          <button id="set-save">Save</button>
+          <button id="set-cancel" data-i18n="cancel">Cancel</button>
+          <button id="set-save" data-i18n="save">Save</button>
         </div>
 
         <div class="set-updates">
           <span class="upd-ver">Clauddy v<span id="app-version">—</span></span>
           <span class="upd-right">
             <span id="upd-status"></span>
-            <button type="button" id="upd-check" class="acc-link">Check for updates</button>
-            <button type="button" id="upd-now" class="upd-btn" hidden>Update now</button>
+            <button type="button" id="upd-check" class="acc-link" data-i18n="checkForUpdates">Check for updates</button>
+            <button type="button" id="upd-now" class="upd-btn" hidden data-i18n="updateNow">Update now</button>
           </span>
         </div>
       </div>
     </div>
+    <script src="../i18n-strings.js"></script>
     <script src="pet.js"></script>
   </body>
 </html>

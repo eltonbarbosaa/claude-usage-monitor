@@ -13,6 +13,7 @@
     "preload.js",
     "usage.js",
     "auth.js",
+    "i18n-strings.js",
     "config.json",
     "renderer"
   ],
@@ -68,6 +69,7 @@
       "preload.js",
       "usage.js",
       "auth.js",
+      "i18n-strings.js",
       "config.json",
       "renderer/**",
       "build/trayTemplate.png",

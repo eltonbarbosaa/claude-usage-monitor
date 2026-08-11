@@ -140,6 +140,30 @@ const SPRITE = [
   }, 3800)
 })()
 
+// i18n: `window.STRINGS` comes from i18n-strings.js (loaded before this
+// file) — single dict shared with main.js's tray/notifications. `lang`
+// defaults to Portuguese (this fork's default) until config.js says
+// otherwise; changing the Settings toggle updates it live, saved on Save.
+let lang = 'pt'
+function t(key, vars) {
+  const dict = window.STRINGS?.[lang] || {}
+  let s = dict[key] ?? window.STRINGS?.en?.[key] ?? key
+  if (vars) for (const k in vars) s = s.replaceAll(`{${k}}`, vars[k])
+  return s
+}
+function applyI18n() {
+  for (const node of document.querySelectorAll('[data-i18n]')) {
+    node.textContent = t(node.dataset.i18n)
+  }
+  for (const node of document.querySelectorAll('[data-i18n-title]')) {
+    node.title = t(node.dataset.i18nTitle)
+  }
+  for (const node of document.querySelectorAll('[data-i18n-placeholder]')) {
+    node.placeholder = t(node.dataset.i18nPlaceholder)
+  }
+}
+applyI18n() // initial pass with the default language, before config arrives
+
 // helpers
 function fmtTokens(t) {
   t = t || 0
@@ -149,7 +173,7 @@ function fmtTokens(t) {
   return String(t)
 }
 function fmtReset(ms) {
-  if (!ms || ms <= 0) return 'now'
+  if (!ms || ms <= 0) return t('resetNow')
   const h = Math.floor(ms / 3600000)
   const m = Math.floor((ms % 3600000) / 60000)
   return h > 0 ? `${h}h ${m}m` : `${m}m`
@@ -340,7 +364,8 @@ function renderHeat(days) {
     }
     sq.className = `sq${lv ? ` lv${lv}` : ''}`
     const daysAgo = days.length - 1 - i
-    sq.title = `${daysAgo === 0 ? 'today' : `${daysAgo}d ago`} · ${fmtTokens(v)} tokens`
+    const when = daysAgo === 0 ? t('heatToday') : t('heatDaysAgo', { n: daysAgo })
+    sq.title = t('heatTooltip', { when, n: fmtTokens(v) })
     row.appendChild(sq)
   })
 }
@@ -361,7 +386,7 @@ function renderModels(list) {
     box.appendChild(row)
   }
   if (!top.length) {
-    box.innerHTML = '<div class="mrow" style="opacity:.5">no activity</div>'
+    box.innerHTML = `<div class="mrow" style="opacity:.5">${t('noActivity')}</div>`
   }
 }
 
@@ -470,22 +495,31 @@ function render(d) {
   }
   prevState = st
 
+  const ACTIVITY_KEYS = {
+    editing: 'actEditing',
+    reading: 'actReading',
+    planning: 'actPlanning',
+    running: 'actRunning',
+    researching: 'actResearching',
+    delegating: 'actDelegating',
+    waiting: 'actWaiting',
+  }
   const word =
     st === 'working'
-      ? curActivity || 'working' // show what Claude's doing (editing/reading/…)
+      ? t(ACTIVITY_KEYS[curActivity] || 'actWorking') // show what Claude's doing (editing/reading/…)
       : st === 'sleeping'
-        ? 'sleeping'
+        ? t('stSleeping')
         : st === 'stressed'
-          ? 'on fire'
+          ? t('stFire')
           : st === 'tired'
-            ? 'maxed out'
-            : 'idle'
+            ? t('stTired')
+            : t('stIdle')
   el('status-text').textContent = word
   el('mini-text').textContent = word
   el('rate').textContent =
     d.active && d.tokensPerMin > 0
-      ? `${fmtTokens(d.tokensPerMin)} tok/min`
-      : `${fmtTokens(d.today.tokens)} tokens today`
+      ? t('rateTokMin', { n: fmtTokens(d.tokensPerMin) })
+      : t('rateTokensToday', { n: fmtTokens(d.today.tokens) })
 
   if (liveOn && prevPct != null && sessActive && prevPct - sessPct > 25) celebrate()
   prevPct = sessPct
@@ -497,8 +531,8 @@ function render(d) {
   sf.style.width = `${sessPct}%`
   sf.classList.toggle('high', sessPct >= 80)
   el('session-sub').textContent = sessActive
-    ? `resets in ${fmtReset(sessReset)} · ${fmtTokens(d.session.tokens)} tokens`
-    : 'no active session'
+    ? t('resetsIn', { t: fmtReset(sessReset), n: fmtTokens(d.session.tokens) })
+    : t('noActiveSession')
 
   el('week-pct').textContent = `${Math.round(wkPct)}%`
   const wf = el('week-fill')
@@ -506,12 +540,12 @@ function render(d) {
   wf.classList.toggle('high', wkPct >= 80)
   el('week-sub').textContent =
     wkReset != null
-      ? `resets in ${fmtReset(wkReset)} · ${fmtTokens(d.week.tokens)} tokens`
-      : `${fmtTokens(d.week.tokens)} tokens · last 7 days`
+      ? t('resetsIn', { t: fmtReset(wkReset), n: fmtTokens(d.week.tokens) })
+      : t('tokensLast7Days', { n: fmtTokens(d.week.tokens) })
 
   renderModels(d.byModel || [])
   renderHeat(d.days30 || [])
-  el('month-total').textContent = `${fmtTokens(d.monthTokens)} tokens`
+  el('month-total').textContent = t('monthTotalTokens', { n: fmtTokens(d.monthTokens) })
 
   currentRate = d.tokensPerMin || 0
   if (st === 'working') {
@@ -555,12 +589,18 @@ window.api.onDebugState((o) => {
 })
 window.api.onUsage(render)
 window.api.onError((msg) => {
-  el('status-text').textContent = 'error'
+  el('status-text').textContent = t('stError')
   console.error(msg)
 })
 window.api.onConfig((cfg) => {
   currentConfig = cfg || {}
   document.body.classList.toggle('is-menubar', currentConfig.mode === 'menubar')
+  const newLang = currentConfig.language === 'en' ? 'en' : 'pt'
+  if (newLang !== lang) {
+    lang = newLang
+    applyI18n()
+    if (lastData) render(lastData) // refresh dynamic text (status word, rate, subs…)
+  }
 })
 window.api.onRealUsage((u) => {
   realUsage = u || null
@@ -614,8 +654,8 @@ window.api.onAuthResult((r) => {
   } else {
     const e = r?.error || ''
     el('acc-msg').textContent = /429|rate_limit/i.test(e)
-      ? 'Rate limited by Anthropic — wait a few minutes, then try once with a fresh code.'
-      : `Failed: ${e || 'check the code and try again'}`
+      ? t('rateLimited')
+      : t('authFailed', { e: e || t('authFailedGeneric') })
   }
   fitSize()
 })
@@ -632,7 +672,7 @@ el('acc-connect').addEventListener('click', () => {
 el('acc-confirm').addEventListener('click', () => {
   const code = el('acc-code').value.trim()
   if (!code) return
-  el('acc-msg').textContent = 'Checking…'
+  el('acc-msg').textContent = t('checking')
   window.api.authCode(code)
   const b = el('acc-confirm')
   b.disabled = true
@@ -655,21 +695,21 @@ window.api.onUpdateStatus((s) => {
   status.className = ''
   const state = s?.state
   if (state === 'checking') {
-    status.textContent = 'Checking…'
+    status.textContent = t('checking')
     check.hidden = true
   } else if (state === 'uptodate') {
-    status.textContent = "You're up to date"
+    status.textContent = t('upToDate')
     status.className = 'ok'
   } else if (state === 'available') {
     // the button carries the version, so no separate status text is needed
-    now.textContent = `Update to ${s.latest}`
+    now.textContent = t('updateTo', { v: s.latest })
     now.hidden = false
     check.hidden = true
   } else if (state === 'updating') {
-    status.textContent = 'Updating… the app will restart'
+    status.textContent = t('updatingRestart')
     check.hidden = true
   } else if (state === 'error') {
-    status.textContent = 'Check failed'
+    status.textContent = t('checkFailed')
     status.className = 'err'
   }
   // pulse a dot on the gear whenever an update is waiting (cleared once it's
@@ -689,15 +729,30 @@ el('upd-now').addEventListener('click', () => {
 // snapshot of the editable fields, to tell whether there are unsaved changes
 let settingsBaseline = null
 let selectedMode = 'floating'
+let selectedLang = 'pt'
 function setModeUI(mode) {
   selectedMode = mode === 'menubar' ? 'menubar' : 'floating'
   for (const b of document.querySelectorAll('#set-mode .seg-btn')) {
     b.classList.toggle('on', b.dataset.mode === selectedMode)
   }
 }
+function setLangUI(newLang) {
+  selectedLang = newLang === 'en' ? 'en' : 'pt'
+  for (const b of document.querySelectorAll('#set-lang .seg-btn')) {
+    b.classList.toggle('on', b.dataset.lang === selectedLang)
+  }
+  // live preview: the whole panel switches language immediately, not just
+  // on Save — same instant feedback the mode toggle already gives visually.
+  if (selectedLang !== lang) {
+    lang = selectedLang
+    applyI18n()
+    if (lastData) render(lastData)
+  }
+}
 function snapshotSettings() {
   return JSON.stringify({
     mode: selectedMode,
+    lang: selectedLang,
     alerts: el('set-alerts').checked,
     t1: el('set-t1').value,
     t2: el('set-t2').value,
@@ -715,6 +770,7 @@ function clearSaveDirty() {
 function populateSettings() {
   const c = currentConfig || {}
   setModeUI(c.mode)
+  setLangUI(c.language)
   el('set-alerts').checked = c.alerts !== false
   const th = c.alertThresholds || [80, 95]
   el('set-t1').value = th[0] != null ? th[0] : 80
@@ -754,6 +810,13 @@ for (const b of document.querySelectorAll('#set-mode .seg-btn')) {
     refreshSaveDirty()
   })
 }
+// language segmented control (English | Português)
+for (const b of document.querySelectorAll('#set-lang .seg-btn')) {
+  b.addEventListener('click', () => {
+    setLangUI(b.dataset.lang)
+    refreshSaveDirty()
+  })
+}
 el('set-cancel').addEventListener('click', () => {
   document.body.classList.remove('settings-open')
   clearSaveDirty()
@@ -764,6 +827,7 @@ el('set-save').addEventListener('click', () => {
   const fire = num('set-fire')
   window.api.saveConfig({
     mode: selectedMode,
+    language: selectedLang,
     alerts: el('set-alerts').checked,
     alertThresholds: [num('set-t1'), num('set-t2')]
       .filter((n) => n >= 1 && n <= 100)

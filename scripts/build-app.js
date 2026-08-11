@@ -17,7 +17,13 @@ try {
     if (Object.keys(pkg.dependencies).length === 0) delete pkg.dependencies
     fs.writeFileSync(PKG, `${JSON.stringify(pkg, null, 2)}\n`)
   }
-  execFileSync(builder, process.argv.slice(2), { stdio: 'inherit' })
+  // on Windows, node_modules/.bin/electron-builder is a shim without a .exe
+  // extension (a .cmd file does the real dispatch) — spawnSync can't exec it
+  // directly, so route through the shell there (harmless no-op on mac/linux).
+  execFileSync(builder, process.argv.slice(2), {
+    stdio: 'inherit',
+    shell: process.platform === 'win32',
+  })
 } finally {
   fs.writeFileSync(PKG, original)
 }

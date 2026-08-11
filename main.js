@@ -15,8 +15,19 @@ const os = require('node:os')
 const { spawn } = require('node:child_process')
 const { getUsage } = require('./usage')
 const auth = require('./auth')
+const STRINGS = require('./i18n-strings.js')
 
 const REPO = 'renatoaug/claude-usage-monitor'
+
+// simple {var} substitution against the string dict for the app's current
+// language (config.language) — mirrors the renderer's t() in pet.js, kept
+// separate since main.js can't load a <script> the renderer uses.
+function t(key, vars) {
+  const lang = config?.language === 'en' ? 'en' : 'pt'
+  let s = STRINGS[lang][key] ?? STRINGS.en[key] ?? key
+  if (vars) for (const k in vars) s = s.replaceAll(`{${k}}`, vars[k])
+  return s
+}
 
 // data dir: kept outside the project folder so moving the repo doesn't break it.
 // when CLAUDE_CONFIG_DIR is set (e.g. via direnv for multi-account setups), nest
@@ -57,6 +68,7 @@ function publicConfig(c) {
     weeklyTokenBudget: c.weeklyTokenBudget,
     weeklyAnchorIso: c.weeklyAnchorIso,
     mode: c.mode,
+    language: c.language,
     alerts: c.alerts,
     alertThresholds: c.alertThresholds,
     fireThreshold: c.fireThreshold,
@@ -70,6 +82,7 @@ function loadConfig() {
     weeklyTokenBudget: 3450000000,
     weeklyAnchorIso: null,
     mode: 'floating', // 'floating' widget or 'menubar' popover
+    language: 'pt', // 'pt' or 'en' — fork default is Portuguese
     alerts: true,
     alertThresholds: [80, 95],
     fireThreshold: 90, // session % at which the pet catches fire (tired still fixed at 100)
@@ -91,18 +104,18 @@ function checkAlerts(config, d) {
   if (!config.alerts || !Notification.isSupported()) return
   const ths = config.alertThresholds || [80, 95]
   const scopes = [
-    ['session', d.session.pct],
-    ['weekly usage', d.week.pct],
+    [t('notifScopeSession'), d.session.pct],
+    [t('notifScopeWeekly'), d.week.pct],
   ]
   for (const [name, pct] of scopes) {
-    for (const t of ths) {
-      const key = `${name}:${t}`
-      if (pct >= t) {
+    for (const th of ths) {
+      const key = `${name}:${th}`
+      if (pct >= th) {
         if (!armed.has(key)) {
           armed.add(key)
           new Notification({
-            title: 'Clauddy',
-            body: `Your ${name} is over ${t}% — now at ${Math.round(pct)}%`,
+            title: t('notifTitle'),
+            body: t('notifBody', { name, t: th, pct: Math.round(pct) }),
             silent: false,
           }).show()
         }
@@ -211,7 +224,7 @@ function ensureTray() {
   const img = nativeImage.createFromPath(path.join(__dirname, 'build', iconFile))
   if (isMac) img.setTemplateImage(true)
   tray = new Tray(img)
-  tray.setToolTip('Clauddy')
+  tray.setToolTip(t('notifTitle'))
   tray.on('click', (_e, bounds) => {
     trayBounds = bounds
     togglePopover()
@@ -228,13 +241,13 @@ function destroyTray() {
 
 function trayMenu() {
   return Menu.buildFromTemplate([
-    { label: 'Open Clauddy', click: () => showPopover() },
+    { label: t('trayOpen'), click: () => showPopover() },
     {
-      label: 'Open Usage page',
+      label: t('trayOpenUsage'),
       click: () => shell.openExternal('https://claude.ai/settings/usage'),
     },
     { type: 'separator' },
-    { label: 'Quit Clauddy', click: () => app.quit() },
+    { label: t('trayQuit'), click: () => app.quit() },
   ])
 }
 
@@ -275,13 +288,13 @@ function updateTray() {
   if (!tray) return
   if (sessionPct == null) {
     if (process.platform === 'darwin') tray.setTitle('')
-    tray.setToolTip('Clauddy — connect your account for live %')
+    tray.setToolTip(t('trayTooltipDisconnected'))
     return
   }
   const pct = Math.round(sessionPct)
   const hot = pct >= (config?.fireThreshold ?? 90)
   if (process.platform === 'darwin') tray.setTitle(hot ? ` ${pct}% 🔥` : ` ${pct}%`)
-  tray.setToolTip(`Clauddy — session ${pct}%`)
+  tray.setToolTip(t('trayTooltipSession', { pct }))
 }
 
 // send real usage to the renderer and refresh the tray title in one place

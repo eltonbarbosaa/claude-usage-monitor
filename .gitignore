@@ -1,6 +1,10 @@
 node_modules/
 dist/
 
+# project uses bun (bun.lock) — npm's lockfile is local-only, from installing
+# with npm instead (no bun available in this environment)
+package-lock.json
+
 # local OAuth token — never commit
 auth.json
 

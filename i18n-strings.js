@@ -1,0 +1,192 @@
+// Single source of truth for every user-facing string in the app.
+// Loaded two ways: `require()`d by main.js (tray/notifications, Node/CommonJS),
+// and via a plain <script> tag in renderer/index.html (before pet.js), which
+// attaches it to `window.STRINGS` instead — same object either way, so
+// adding a key here updates both the main process and the renderer.
+const STRINGS = {
+  en: {
+    // window controls / titles
+    settingsTitle: 'Settings',
+    openUsageTitle: 'Open Usage page',
+    minimizeTitle: 'Minimize / expand',
+    closeTitle: 'Close',
+
+    // status words (idle/sleeping/working states + activities)
+    stIdle: 'idle',
+    stSleeping: 'sleeping',
+    stFire: 'on fire',
+    stTired: 'maxed out',
+    stError: 'error',
+    actEditing: 'editing',
+    actReading: 'reading',
+    actPlanning: 'planning',
+    actRunning: 'running',
+    actResearching: 'researching',
+    actDelegating: 'delegating',
+    actWaiting: 'waiting',
+    actWorking: 'working',
+
+    // status line / rate
+    rateTokMin: '{n} tok/min',
+    rateTokensToday: '{n} tokens today',
+    liveTag: 'live',
+
+    // limits section
+    currentSession: 'current session',
+    miniSessionLabel: 'session',
+    weeklyAllModels: 'weekly · all models',
+    noActiveSession: 'no active session',
+    resetsIn: 'resets in {t} · {n} tokens',
+    tokensLast7Days: '{n} tokens · last 7 days',
+    connectAccount: 'Connect your account',
+    toSeeRealUsage: 'to see your real usage',
+    resetNow: 'now',
+
+    // by model / heatmap
+    byModel7Days: 'by model · 7 days',
+    noActivity: 'no activity',
+    days30: '30 days',
+    monthTotalTokens: '{n} tokens',
+    heatToday: 'today',
+    heatDaysAgo: '{n}d ago',
+    heatTooltip: '{when} · {n} tokens',
+
+    // account / auth
+    connectHint: 'Connect your account to show your real usage %.',
+    logInWithBrowser: 'Log in with browser',
+    pasteCodeHint: 'After logging in, paste the code from the browser page:',
+    authCodePlaceholder: 'authentication code',
+    connectBtn: 'Connect',
+    connectedLive: '● Connected · live data',
+    disconnect: 'Disconnect',
+    checking: 'Checking…',
+    rateLimited: 'Rate limited by Anthropic — wait a few minutes, then try once with a fresh code.',
+    authFailed: 'Failed: {e}',
+    authFailedGeneric: 'check the code and try again',
+
+    // settings panel
+    settingsTitleLabel: 'Settings',
+    display: 'Display',
+    floatingPet: 'Floating pet',
+    menuBar: 'Menu bar',
+    language: 'Language',
+    langEnglish: 'English',
+    langPortuguese: 'Português',
+    alerts: 'Alerts',
+    headsUp: 'heads-up',
+    nearLimit: 'near limit',
+    catchFire: 'Catch fire',
+    sessionPercent: 'session %',
+    cancel: 'Cancel',
+    save: 'Save',
+    checkForUpdates: 'Check for updates',
+    updateNow: 'Update now',
+    updateTo: 'Update to {v}',
+    upToDate: "You're up to date",
+    updatingRestart: 'Updating… the app will restart',
+    checkFailed: 'Check failed',
+
+    // tray (main process)
+    trayOpen: 'Open Clauddy',
+    trayOpenUsage: 'Open Usage page',
+    trayQuit: 'Quit Clauddy',
+    trayTooltipDisconnected: 'Clauddy — connect your account for live %',
+    trayTooltipSession: 'Clauddy — session {pct}%',
+
+    // notifications (main process)
+    notifTitle: 'Clauddy',
+    notifBody: 'Your {name} is over {t}% — now at {pct}%',
+    notifScopeSession: 'session',
+    notifScopeWeekly: 'weekly usage',
+  },
+  pt: {
+    settingsTitle: 'Configurações',
+    openUsageTitle: 'Abrir página de uso',
+    minimizeTitle: 'Minimizar / expandir',
+    closeTitle: 'Fechar',
+
+    stIdle: 'ocioso',
+    stSleeping: 'dormindo',
+    stFire: 'pegando fogo',
+    stTired: 'no limite',
+    stError: 'erro',
+    actEditing: 'editando',
+    actReading: 'lendo',
+    actPlanning: 'planejando',
+    actRunning: 'executando',
+    actResearching: 'pesquisando',
+    actDelegating: 'delegando',
+    actWaiting: 'aguardando',
+    actWorking: 'trabalhando',
+
+    rateTokMin: '{n} tok/min',
+    rateTokensToday: '{n} tokens hoje',
+    liveTag: 'ao vivo',
+
+    currentSession: 'sessão atual',
+    miniSessionLabel: 'sessão',
+    weeklyAllModels: 'semanal · todos os modelos',
+    noActiveSession: 'nenhuma sessão ativa',
+    resetsIn: 'reinicia em {t} · {n} tokens',
+    tokensLast7Days: '{n} tokens · últimos 7 dias',
+    connectAccount: 'Conecte sua conta',
+    toSeeRealUsage: 'para ver seu uso real',
+    resetNow: 'agora',
+
+    byModel7Days: 'por modelo · 7 dias',
+    noActivity: 'sem atividade',
+    days30: '30 dias',
+    monthTotalTokens: '{n} tokens',
+    heatToday: 'hoje',
+    heatDaysAgo: 'há {n}d',
+    heatTooltip: '{when} · {n} tokens',
+
+    connectHint: 'Conecte sua conta para mostrar seu uso real em %.',
+    logInWithBrowser: 'Entrar pelo navegador',
+    pasteCodeHint: 'Depois de entrar, cole o código da página do navegador:',
+    authCodePlaceholder: 'código de autenticação',
+    connectBtn: 'Conectar',
+    connectedLive: '● Conectado · dados ao vivo',
+    disconnect: 'Desconectar',
+    checking: 'Verificando…',
+    rateLimited:
+      'Limite de requisições da Anthropic atingido — espere alguns minutos e tente de novo com um código novo.',
+    authFailed: 'Falhou: {e}',
+    authFailedGeneric: 'confira o código e tente novamente',
+
+    settingsTitleLabel: 'Configurações',
+    display: 'Exibição',
+    floatingPet: 'Bichinho flutuante',
+    menuBar: 'Barra de menu',
+    language: 'Idioma',
+    langEnglish: 'English',
+    langPortuguese: 'Português',
+    alerts: 'Alertas',
+    headsUp: 'atenção',
+    nearLimit: 'perto do limite',
+    catchFire: 'Pegar fogo',
+    sessionPercent: '% da sessão',
+    cancel: 'Cancelar',
+    save: 'Salvar',
+    checkForUpdates: 'Verificar atualizações',
+    updateNow: 'Atualizar agora',
+    updateTo: 'Atualizar para {v}',
+    upToDate: 'Você está atualizado',
+    updatingRestart: 'Atualizando… o app vai reiniciar',
+    checkFailed: 'Falha ao verificar',
+
+    trayOpen: 'Abrir Clauddy',
+    trayOpenUsage: 'Abrir página de uso',
+    trayQuit: 'Sair do Clauddy',
+    trayTooltipDisconnected: 'Clauddy — conecte sua conta pra ver % ao vivo',
+    trayTooltipSession: 'Clauddy — sessão {pct}%',
+
+    notifTitle: 'Clauddy',
+    notifBody: 'Sua {name} passou de {t}% — agora em {pct}%',
+    notifScopeSession: 'sessão',
+    notifScopeWeekly: 'uso semanal',
+  },
+}
+
+if (typeof module !== 'undefined' && module.exports) module.exports = STRINGS
+if (typeof window !== 'undefined') window.STRINGS = STRINGS
