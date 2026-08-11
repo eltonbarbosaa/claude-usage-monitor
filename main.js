@@ -444,13 +444,15 @@ ipcMain.on('save-config', (_e, patch) => {
 })
 
 // ---- self-update (checks the latest GitHub release, runs install.sh) ---------
-async function fetchLatestTag() {
+async function fetchLatestRelease() {
   const res = await fetch(`https://api.github.com/repos/${REPO}/releases/latest`, {
     headers: { 'User-Agent': 'Clauddy', Accept: 'application/vnd.github+json' },
   })
   if (!res.ok) throw new Error(`HTTP ${res.status}`)
-  const j = await res.json()
-  return j.tag_name // e.g. "v1.9.1"
+  return res.json()
+}
+async function fetchLatestTag() {
+  return (await fetchLatestRelease()).tag_name // e.g. "v1.9.1"
 }
 // compare two "1.2.3" versions; >0 if a is newer than b
 function cmpVer(a, b) {
@@ -487,18 +489,48 @@ async function autoUpdateCheck() {
     if (u.available) win.webContents.send('update-status', { state: 'available', latest: u.latest })
   } catch {} // offline / rate-limited: stay quiet, try again on the next tick
 }
-ipcMain.on('do-update', () => {
-  // Windows/Linux have no install.sh: send them to the releases page instead.
-  if (process.platform !== 'darwin') {
-    shell.openExternal(`https://github.com/${REPO}/releases/latest`)
+ipcMain.on('do-update', async () => {
+  const send = (s) => win && !win.isDestroyed() && win.webContents.send('update-status', s)
+
+  if (process.platform === 'darwin') {
+    send({ state: 'updating' })
+    const cmd = `curl -fsSL https://raw.githubusercontent.com/${REPO}/main/install.sh | bash`
+    const child = spawn('/bin/bash', ['-lc', cmd], { detached: true, stdio: 'ignore' })
+    child.unref()
+    // quit so the installer can replace the running .app and relaunch the new build
+    setTimeout(() => app.quit(), 1500)
     return
   }
-  if (win && !win.isDestroyed()) win.webContents.send('update-status', { state: 'updating' })
-  const cmd = `curl -fsSL https://raw.githubusercontent.com/${REPO}/main/install.sh | bash`
-  const child = spawn('/bin/bash', ['-lc', cmd], { detached: true, stdio: 'ignore' })
-  child.unref()
-  // quit so the installer can replace the running .app and relaunch the new build
-  setTimeout(() => app.quit(), 1500)
+
+  if (process.platform === 'win32') {
+    // Same idea as macOS: download the NSIS installer for the latest release
+    // and run it silently (/S) — it closes the running app, replaces the
+    // install, and relaunches (runAfterFinish in the build config), so this
+    // needs no more babysitting than the curl|bash path above.
+    try {
+      const release = await fetchLatestRelease()
+      const asset = release.assets?.find((a) => a.name.endsWith('-setup.exe'))
+      if (!asset) {
+        shell.openExternal(`https://github.com/${REPO}/releases/latest`)
+        return
+      }
+      send({ state: 'updating' })
+      const res = await fetch(asset.browser_download_url)
+      if (!res.ok) throw new Error(`HTTP ${res.status}`)
+      const installerPath = path.join(os.tmpdir(), asset.name)
+      fs.writeFileSync(installerPath, Buffer.from(await res.arrayBuffer()))
+      const child = spawn(installerPath, ['/S'], { detached: true, stdio: 'ignore' })
+      child.unref()
+      setTimeout(() => app.quit(), 1500)
+    } catch (e) {
+      send({ state: 'error', message: String(e?.message || e) })
+    }
+    return
+  }
+
+  // Linux: no silent installer format shipped (AppImage/tar.gz) — same
+  // fallback as before.
+  shell.openExternal(`https://github.com/${REPO}/releases/latest`)
 })
 
 ipcMain.on('quit', () => app.quit())
@@ -535,6 +567,18 @@ function enableLinuxAutostart() {
   fs.writeFileSync(desktopFile, entry)
 }
 
+// Windows/macOS: app.setLoginItemSettings({ openAtLogin: true }) is a no-op
+// once Electron already thinks it's enabled — it doesn't re-check that the
+// registered path still matches the CURRENT install (e.g. moved between an
+// old manual copy and the real installer's folder, or a version upgrade
+// that reinstalls elsewhere). A stale entry silently fails to launch at the
+// next login. Forcing an off→on toggle makes Electron rewrite it with
+// `process.execPath` every time, so it self-heals instead of drifting.
+function refreshLoginItem() {
+  app.setLoginItemSettings({ openAtLogin: false })
+  app.setLoginItemSettings({ openAtLogin: true, openAsHidden: false, path: process.execPath })
+}
+
 // a second launch attempt (double-click, `bunx clauddy` again…) lands here
 // instead of opening its own window — just bring the real one forward.
 app.on('second-instance', () => {
@@ -559,7 +603,7 @@ app.whenReady().then(() => {
     if (process.platform === 'linux') {
       enableLinuxAutostart()
     } else {
-      app.setLoginItemSettings({ openAtLogin: true, openAsHidden: false })
+      refreshLoginItem()
     }
   }
 })
