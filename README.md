@@ -103,13 +103,21 @@ A primeira execução baixa o Electron, então dê um tempinho. Prático pra uma
 
 ### Windows (x64)
 
-O caminho mais rápido funciona igual ao macOS — com [Bun](https://bun.sh) ou Node 24 instalado:
+#### 1. Instalador — cria atalhos e abre no login (recomendado)
+
+Pegue o **instalador** (`Clauddy-<versão>-setup.exe`) na [última release](https://github.com/renatoaug/claude-usage-monitor/releases) e rode. Ele instala só pro seu usuário (sem precisar de admin), pergunta a pasta, cria atalho na área de trabalho e no menu Iniciar, e abre o Clauddy ao terminar. Como o app não é assinado, o **SmartScreen** do Windows mostra um aviso de "O Windows protegeu seu PC" na primeira vez — clique em **Mais informações → Executar assim mesmo**. Tem um desinstalador de verdade (Painel de Controle → Programas, ou o atalho no menu Iniciar).
+
+#### 2. Zip portátil (sem instalar)
+
+Pegue o **zip portátil** (`Clauddy-<versão>-win.zip`) na [última release](https://github.com/renatoaug/claude-usage-monitor/releases), descompacte em qualquer lugar, e rode `Clauddy.exe`. Não cria atalhos nem se registra pra abrir no login sozinho — bom pra testar rápido ou rodar de um pendrive.
+
+#### 3. Via `bunx` (sem instalar nada)
+
+Funciona igual ao macOS — com [Bun](https://bun.sh) ou Node 24 instalado:
 
 ```powershell
 bunx clauddy   # ou: npx clauddy
 ```
-
-Prefere um app independente sem Node/Bun? Pegue o **zip portátil** (`Clauddy-<versão>-win.zip`) na [última release](https://github.com/renatoaug/claude-usage-monitor/releases), descompacte em qualquer lugar, e rode `Clauddy.exe`. Como o app não é assinado, o **SmartScreen** do Windows mostra um aviso de "O Windows protegeu seu PC" na primeira vez — clique em **Mais informações → Executar assim mesmo**. Depois disso ele inicia junto com o Windows.
 
 > Os builds do Windows são gerados pelo workflow **Build** (Actions ▸ Build) — anexá-los automaticamente a cada release está no roteiro.
 
