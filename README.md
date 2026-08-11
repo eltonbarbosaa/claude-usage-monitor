@@ -82,7 +82,7 @@ Dois jeitos, dependendo do que você quer:
 Um comando só — ele baixa a última versão e coloca em `/Applications`:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/renatoaug/claude-usage-monitor/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/eltonbarbosaa/claude-usage-monitor/main/install.sh | bash
 ```
 
 **Clauddy é gratuito e open source** — o comando acima só baixa a última versão deste repositório e coloca em `/Applications`, nada mais (você pode ler o [`install.sh`](install.sh) antes, se quiser).
@@ -105,11 +105,11 @@ A primeira execução baixa o Electron, então dê um tempinho. Prático pra uma
 
 #### 1. Instalador — cria atalhos e abre no login (recomendado)
 
-Pegue o **instalador** (`Clauddy-<versão>-setup.exe`) na [última release](https://github.com/renatoaug/claude-usage-monitor/releases) e rode. Ele instala só pro seu usuário (sem precisar de admin), pergunta a pasta, cria atalho na área de trabalho e no menu Iniciar, e abre o Clauddy ao terminar. Como o app não é assinado, o **SmartScreen** do Windows mostra um aviso de "O Windows protegeu seu PC" na primeira vez — clique em **Mais informações → Executar assim mesmo**. Tem um desinstalador de verdade (Painel de Controle → Programas, ou o atalho no menu Iniciar).
+Pegue o **instalador** (`Clauddy-<versão>-setup.exe`) na [última release](https://github.com/eltonbarbosaa/claude-usage-monitor/releases) e rode. Ele instala só pro seu usuário (sem precisar de admin), pergunta a pasta, cria atalho na área de trabalho e no menu Iniciar, e abre o Clauddy ao terminar. Como o app não é assinado, o **SmartScreen** do Windows mostra um aviso de "O Windows protegeu seu PC" na primeira vez — clique em **Mais informações → Executar assim mesmo**. Tem um desinstalador de verdade (Painel de Controle → Programas, ou o atalho no menu Iniciar).
 
 #### 2. Zip portátil (sem instalar)
 
-Pegue o **zip portátil** (`Clauddy-<versão>-win.zip`) na [última release](https://github.com/renatoaug/claude-usage-monitor/releases), descompacte em qualquer lugar, e rode `Clauddy.exe`. Não cria atalhos nem se registra pra abrir no login sozinho — bom pra testar rápido ou rodar de um pendrive.
+Pegue o **zip portátil** (`Clauddy-<versão>-win.zip`) na [última release](https://github.com/eltonbarbosaa/claude-usage-monitor/releases), descompacte em qualquer lugar, e rode `Clauddy.exe`. Não cria atalhos nem se registra pra abrir no login sozinho — bom pra testar rápido ou rodar de um pendrive.
 
 #### 3. Via `bunx` (sem instalar nada)
 
@@ -129,7 +129,7 @@ O caminho mais rápido funciona igual ao macOS — com [Bun](https://bun.sh) ou 
 bunx clauddy   # ou: npx clauddy
 ```
 
-Prefere um app independente? Pegue o **AppImage** ou **tar.gz** (`Clauddy-<versão>.AppImage` / `clauddy-<versão>.tar.gz`) na [última release](https://github.com/renatoaug/claude-usage-monitor/releases), depois:
+Prefere um app independente? Pegue o **AppImage** ou **tar.gz** (`Clauddy-<versão>.AppImage` / `clauddy-<versão>.tar.gz`) na [última release](https://github.com/eltonbarbosaa/claude-usage-monitor/releases), depois:
 
 ```bash
 chmod +x Clauddy-*.AppImage

@@ -29,7 +29,7 @@ if (!gotSingleInstanceLock) {
   app.quit()
 }
 
-const REPO = 'renatoaug/claude-usage-monitor'
+const REPO = 'eltonbarbosaa/claude-usage-monitor'
 
 // simple {var} substitution against the string dict for the app's current
 // language (config.language) — mirrors the renderer's t() in pet.js, kept

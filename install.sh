@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 # Install Clauddy as a native app, with no Gatekeeper hassle.
 #
-#   curl -fsSL https://raw.githubusercontent.com/renatoaug/claude-usage-monitor/main/install.sh | bash
+#   curl -fsSL https://raw.githubusercontent.com/eltonbarbosaa/claude-usage-monitor/main/install.sh | bash
 #
 # Files downloaded with curl aren't quarantined like browser downloads, so the
 # (unsigned, ad-hoc) app opens with a double-click — no "damaged" warning.
 set -euo pipefail
 
-REPO="renatoaug/claude-usage-monitor"
+REPO="eltonbarbosaa/claude-usage-monitor"
 APP_NAME="Clauddy.app"
 DEST="/Applications"
 
