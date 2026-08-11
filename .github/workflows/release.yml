@@ -4,6 +4,12 @@ name: Release
 # Conventional Commits, and — when there's something to ship — computes the
 # version, builds the macOS app, publishes to npm, and cuts a GitHub Release
 # with the .app zip. No version commit is pushed back to main (tag only).
+#
+# Windows and Linux artifacts are built afterward, in a second job, and
+# attached to that same release — they can't run in the `release` job itself
+# because electron-builder needs a real Windows/Linux runner for those
+# targets. That job only fires when `release` actually cut a tag (skipped on
+# pushes with nothing to release, e.g. docs/chore-only commits).
 on:
   push:
     branches: [main]
@@ -13,13 +19,15 @@ concurrency:
   cancel-in-progress: false
 
 permissions:
-  contents: write # create the tag + GitHub Release
+  contents: write # create the tag + GitHub Release, upload extra assets to it
 
 jobs:
   release:
     runs-on: macos-latest # building a .app requires macOS
     env:
       CSC_IDENTITY_AUTO_DISCOVERY: "false" # unsigned build, skip signing
+    outputs:
+      tag: ${{ steps.tag.outputs.tag }} # empty when semantic-release found nothing to ship
     steps:
       - uses: actions/checkout@v7
         with:
@@ -44,3 +52,62 @@ jobs:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: bunx semantic-release
+
+      # semantic-release tags the released commit (vX.Y.Z) but never pushes a
+      # version-bump commit — this just reads back which tag (if any) landed
+      # on HEAD, so the next job knows whether to run and what to build/tag.
+      - name: Detect the tag just released
+        id: tag
+        run: |
+          git fetch --tags --force
+          echo "tag=$(git tag --points-at HEAD | head -n1)" >> "$GITHUB_OUTPUT"
+
+  other-platforms:
+    needs: release
+    if: needs.release.outputs.tag != ''
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-latest
+            dist: dist:win
+          - os: ubuntu-latest
+            dist: dist:linux
+    runs-on: ${{ matrix.os }}
+    env:
+      CSC_IDENTITY_AUTO_DISCOVERY: "false" # unsigned build, skip signing
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ needs.release.outputs.tag }}
+          persist-credentials: false
+
+      - uses: oven-sh/setup-bun@v2
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+
+      - run: bun install --frozen-lockfile
+
+      # semantic-release never commits its version bump back to git (see the
+      # comment up top) — the tag itself is the source of truth, so stamp
+      # package.json from it before building, or the app would report/embed
+      # the previous version.
+      - name: Stamp version from the release tag
+        shell: bash
+        run: npm version "${{ needs.release.outputs.tag }}" --no-git-tag-version --allow-same-version
+
+      - name: Build
+        run: bun run ${{ matrix.dist }}
+
+      - name: Attach to the release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: bash
+        # nullglob: each OS only produces some of these extensions (e.g. no
+        # *.exe on the Linux runner) — without it, an unmatched pattern is
+        # passed through literally and `gh release upload` fails on it.
+        run: |
+          shopt -s nullglob
+          gh release upload "${{ needs.release.outputs.tag }}" dist/*.zip dist/*.exe dist/*.tar.gz dist/*.AppImage --clobber
