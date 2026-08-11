@@ -1,226 +1,228 @@
 # 🟫 Clauddy
 
-A cute pixel-art desktop pet for macOS that tracks your Claude Code usage — mirroring the official **Settings → Usage** panel (current session + weekly limits, in tokens & %), with animations.
+Um bichinho de estimação pixel-art fofo pra macOS que acompanha seu uso do Claude Code — espelhando o painel oficial **Settings → Usage** (sessão atual + limites semanais, em tokens e %), com animações.
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/renatoaug/claude-usage-monitor/main/docs/media/overview.gif" width="300" alt="Clauddy — the full widget showing session, weekly, by-model and 30-day usage" /><br />
-  <em>A little terracotta creature that lives in the corner of your screen, eats your tokens, and naps when you're idle.</em>
+  <img src="https://raw.githubusercontent.com/renatoaug/claude-usage-monitor/main/docs/media/overview.gif" width="300" alt="Clauddy — o widget completo mostrando sessão, semanal, por modelo e uso dos últimos 30 dias" /><br />
+  <em>Uma criaturinha cor de terracota que vive no canto da sua tela, come seus tokens, e tira uma soneca quando você está ocioso.</em>
 </p>
 
-## What it shows
+## O que ele mostra
 
-- **Current session** — real % used + **"resets in Xh Ym"** + session tokens
-- **Weekly · all models** — real % used + tokens over the last 7 days
-- **Status line** under the pet: `● working · 1.6M tok/min` (or today's tokens when idle)
-- **By model · 7 days** — Opus / Sonnet / Haiku / Fable, in tokens
-- **30-day map** — colored squares by daily tokens (green = light → red = heavy), with the monthly total
+- **Sessão atual** — % real usada + **"reinicia em Xh Ym"** + tokens da sessão
+- **Semanal · todos os modelos** — % real usada + tokens dos últimos 7 dias
+- **Linha de status** embaixo do bichinho: `● trabalhando · 1.6M tok/min` (ou tokens de hoje quando ocioso)
+- **Por modelo · 7 dias** — Opus / Sonnet / Haiku / Fable, em tokens
+- **Mapa de 30 dias** — quadradinhos coloridos por tokens diários (verde = leve → vermelho = pesado), com o total mensal
 
-The **percentages are real**, pulled from your account (you log in once — see below). The token counts, by-model breakdown, activity status, and 30-day map come from your local logs (`~/.claude/projects/**/*.jsonl`). Everything is token-based — no dollars.
+As **porcentagens são reais**, vindas direto da sua conta (você faz login uma vez — veja abaixo). A contagem de tokens, o detalhamento por modelo, o status de atividade e o mapa de 30 dias vêm dos seus logs locais (`~/.claude/projects/**/*.jsonl`). Tudo é baseado em tokens — sem valores em dinheiro.
 
-## Account & live usage
+## Conta e uso ao vivo
 
-The session/weekly **%** comes straight from your Anthropic account, so it matches the official panel exactly. You connect once via a browser login:
+A **%** de sessão/semanal vem direto da sua conta Anthropic, então bate exatamente com o painel oficial. Você conecta uma vez via login no navegador:
 
-1. Open **⚙ Settings → "Log in with browser"** — your browser opens an Anthropic auth page.
-2. Log in, copy the **authentication code** shown, and paste it back into the app → **Connect**.
+1. Abra **⚙ Configurações → "Entrar pelo navegador"** — seu navegador abre uma página de autenticação da Anthropic.
+2. Faça login, copie o **código de autenticação** exibido, e cole de volta no app → **Conectar**.
 
-The token is saved locally (see [Data & privacy](#data--privacy)) and refreshed automatically. **Until you connect**, the limits area shows a _"Connect your account"_ prompt instead of percentages.
+O token fica salvo localmente (veja [Dados e privacidade](#dados-e-privacidade)) e é atualizado automaticamente. **Até você conectar**, a área de limites mostra um aviso _"Conecte sua conta"_ em vez das porcentagens.
 
-## The pet's states
-
-<table>
-  <tr>
-    <td align="center"><img src="https://raw.githubusercontent.com/renatoaug/claude-usage-monitor/main/docs/media/idle.gif" width="280" alt="idle" /><br /><b>idle</b><br /><sub>breathes &amp; blinks</sub></td>
-    <td align="center"><img src="https://raw.githubusercontent.com/renatoaug/claude-usage-monitor/main/docs/media/working.gif" width="280" alt="working" /><br /><b>working</b><br /><sub>hops &amp; eats token coins</sub></td>
-  </tr>
-  <tr>
-    <td align="center"><img src="https://raw.githubusercontent.com/renatoaug/claude-usage-monitor/main/docs/media/on-fire.gif" width="280" alt="on fire" /><br /><b>on fire</b><br /><sub>session ≥ 90% → red, shivers, flames</sub></td>
-    <td align="center"><img src="https://raw.githubusercontent.com/renatoaug/claude-usage-monitor/main/docs/media/tired.gif" width="280" alt="maxed out" /><br /><b>maxed out</b><br /><sub>session at 100% → drained, slumped, sweating</sub></td>
-  </tr>
-  <tr>
-    <td align="center"><img src="https://raw.githubusercontent.com/renatoaug/claude-usage-monitor/main/docs/media/sleeping.gif" width="280" alt="sleeping" /><br /><b>sleeping</b><br /><sub>idle 5+ min → blue zzz &amp; moonlight</sub></td>
-    <td align="center"><img src="https://raw.githubusercontent.com/renatoaug/claude-usage-monitor/main/docs/media/poke.gif" width="280" alt="poke" /><br /><b>poke</b><br /><sub>click the pet → squish &amp; hearts</sub></td>
-  </tr>
-  <tr>
-    <td colspan="2" align="center"><img src="https://raw.githubusercontent.com/renatoaug/claude-usage-monitor/main/docs/media/celebrate.gif" width="280" alt="celebrate" /><br /><b>celebrate</b><br /><sub>session resets → jump &amp; confetti</sub></td>
-  </tr>
-</table>
-
-Plus a welcome **wave** on launch. You can [poke the pet from the terminal](#play-with-the-pet) too.
-
-### What Claude's up to
-
-While Claude Code is actively working, the pet sets up a little desk scene that
-mirrors **what it's doing right now** — inferred from your local logs (the last
-tool it used). The status line names the activity, and three of them get their
-own animated scene:
+## Os estados do bichinho
 
 <table>
   <tr>
-    <td align="center"><img src="https://raw.githubusercontent.com/renatoaug/claude-usage-monitor/main/docs/media/reading.gif" width="280" alt="reading" /><br /><b>reading</b><br /><sub>puts on glasses &amp; flips through docs</sub></td>
-    <td align="center"><img src="https://raw.githubusercontent.com/renatoaug/claude-usage-monitor/main/docs/media/editing.gif" width="280" alt="editing" /><br /><b>editing</b><br /><sub>types at the laptop, coffee in reach</sub></td>
+    <td align="center"><img src="https://raw.githubusercontent.com/renatoaug/claude-usage-monitor/main/docs/media/idle.gif" width="280" alt="ocioso" /><br /><b>ocioso</b><br /><sub>respira e pisca</sub></td>
+    <td align="center"><img src="https://raw.githubusercontent.com/renatoaug/claude-usage-monitor/main/docs/media/working.gif" width="280" alt="trabalhando" /><br /><b>trabalhando</b><br /><sub>pula e come moedas de token</sub></td>
   </tr>
   <tr>
-    <td colspan="2" align="center"><img src="https://raw.githubusercontent.com/renatoaug/claude-usage-monitor/main/docs/media/running.gif" width="280" alt="running" /><br /><b>running</b><br /><sub>watches a task log tick through its checks</sub></td>
+    <td align="center"><img src="https://raw.githubusercontent.com/renatoaug/claude-usage-monitor/main/docs/media/on-fire.gif" width="280" alt="pegando fogo" /><br /><b>pegando fogo</b><br /><sub>sessão ≥ 90% → vermelho, treme, chamas</sub></td>
+    <td align="center"><img src="https://raw.githubusercontent.com/renatoaug/claude-usage-monitor/main/docs/media/tired.gif" width="280" alt="no limite" /><br /><b>no limite</b><br /><sub>sessão em 100% → exausto, caído, suando</sub></td>
+  </tr>
+  <tr>
+    <td align="center"><img src="https://raw.githubusercontent.com/renatoaug/claude-usage-monitor/main/docs/media/sleeping.gif" width="280" alt="dormindo" /><br /><b>dormindo</b><br /><sub>ocioso 5+ min → zzz azul e luar</sub></td>
+    <td align="center"><img src="https://raw.githubusercontent.com/renatoaug/claude-usage-monitor/main/docs/media/poke.gif" width="280" alt="cutucar" /><br /><b>cutucar</b><br /><sub>clique no bichinho → se espreme e solta corações</sub></td>
+  </tr>
+  <tr>
+    <td colspan="2" align="center"><img src="https://raw.githubusercontent.com/renatoaug/claude-usage-monitor/main/docs/media/celebrate.gif" width="280" alt="comemorar" /><br /><b>comemorar</b><br /><sub>sessão reinicia → pula e solta confete</sub></td>
   </tr>
 </table>
 
-Other activities — **planning**, **researching**, **delegating**, **waiting** —
-show up in the status line as they happen. When Claude goes quiet, the pet drops
-back to plain **working** / **idle**.
+Além de um **acenar** de boas-vindas ao abrir. Você também pode [cutucar o bichinho pelo terminal](#brinque-com-o-bichinho).
 
-## Install
+### O que o Claude está fazendo
 
-**macOS (Apple Silicon)** is the first-class build. **Windows (x64)** and **Linux (x64)** work too. The `bunx`/`npx` route below runs on all of them today.
+Enquanto o Claude Code está trabalhando ativamente, o bichinho monta uma
+cenazinha de mesa que espelha **o que ele está fazendo agora** — inferido dos
+seus logs locais (a última ferramenta usada). A linha de status nomeia a
+atividade, e três delas ganham sua própria cena animada:
+
+<table>
+  <tr>
+    <td align="center"><img src="https://raw.githubusercontent.com/renatoaug/claude-usage-monitor/main/docs/media/reading.gif" width="280" alt="lendo" /><br /><b>lendo</b><br /><sub>coloca óculos e folheia documentos</sub></td>
+    <td align="center"><img src="https://raw.githubusercontent.com/renatoaug/claude-usage-monitor/main/docs/media/editing.gif" width="280" alt="editando" /><br /><b>editando</b><br /><sub>digita no laptop, café ao alcance</sub></td>
+  </tr>
+  <tr>
+    <td colspan="2" align="center"><img src="https://raw.githubusercontent.com/renatoaug/claude-usage-monitor/main/docs/media/running.gif" width="280" alt="executando" /><br /><b>executando</b><br /><sub>observa um log de tarefas passando pelas checagens</sub></td>
+  </tr>
+</table>
+
+Outras atividades — **planejando**, **pesquisando**, **delegando**,
+**aguardando** — aparecem na linha de status conforme acontecem. Quando o
+Claude fica quieto, o bichinho volta pro simples **trabalhando** / **ocioso**.
+
+## Instalação
+
+**macOS (Apple Silicon)** é o build principal. **Windows (x64)** e **Linux (x64)** também funcionam. O caminho `bunx`/`npx` abaixo roda em todos eles hoje.
 
 ### macOS
 
-Two ways, depending on what you want:
+Dois jeitos, dependendo do que você quer:
 
-#### 1. Install as an app — opens at login (recommended)
+#### 1. Instalar como app — abre no login (recomendado)
 
-One command — it downloads the latest release and drops it in `/Applications`:
+Um comando só — ele baixa a última versão e coloca em `/Applications`:
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/renatoaug/claude-usage-monitor/main/install.sh | bash
 ```
 
-**Clauddy is free and open source** — the command above just downloads the latest release from this repo and drops it in `/Applications`, nothing else (you can read [`install.sh`](install.sh) first if you'd like).
+**Clauddy é gratuito e open source** — o comando acima só baixa a última versão deste repositório e coloca em `/Applications`, nada mais (você pode ler o [`install.sh`](install.sh) antes, se quiser).
 
-Once installed, you can update in-app: **⚙ Settings → Check for updates → Update now** runs the same installer and relaunches the new build.
+Depois de instalado, dá pra atualizar direto pelo app: **⚙ Configurações → Verificar atualizações → Atualizar agora** roda o mesmo instalador e reabre a nova versão.
 
-Why not a normal download? macOS blocks **unsigned** apps downloaded through a browser with a scary *"damaged, move to Trash"* warning — even when they're perfectly safe. It's a false alarm: the only way to silence it is to pay Apple **$99/year** to sign + notarize, which a free hobby app skips. Files fetched with `curl` aren't flagged, so this method simply **lets your Mac open the app** without the block. It then registers in **Login Items** and starts with your Mac — set it and forget it.
+Por que não um download normal? O macOS bloqueia apps **não assinados** baixados pelo navegador com um aviso assustador de *"danificado, mover para o lixo"* — mesmo quando são perfeitamente seguros. É um falso alarme: a única forma de silenciar isso é pagar à Apple **US$ 99/ano** pra assinar + notarizar, o que um app hobby gratuito não faz. Arquivos baixados com `curl` não são sinalizados, então esse método simplesmente **deixa seu Mac abrir o app** sem o bloqueio. Depois ele se registra nos **Itens de Login** e inicia junto com o Mac — configura uma vez e esquece.
 
-#### 2. Run it via `bunx` (no install)
+#### 2. Rodar via `bunx` (sem instalar)
 
-Needs [Bun](https://bun.sh) (or use `npx` with Node 24):
+Precisa do [Bun](https://bun.sh) (ou use `npx` com Node 24):
 
 ```bash
 bunx clauddy
 ```
 
-The first run downloads Electron, so give it a moment. Handy for a quick run, but it stays up **only while that command is open** and won't start on its own. Quit it with the **×** button.
+A primeira execução baixa o Electron, então dê um tempinho. Prático pra uma execução rápida, mas ele só fica de pé **enquanto esse comando estiver aberto** e não inicia sozinho. Feche com o botão **×**.
 
 ### Windows (x64)
 
-The quickest path works the same as macOS — with [Bun](https://bun.sh) or Node 24 installed:
+O caminho mais rápido funciona igual ao macOS — com [Bun](https://bun.sh) ou Node 24 instalado:
 
 ```powershell
-bunx clauddy   # or: npx clauddy
+bunx clauddy   # ou: npx clauddy
 ```
 
-Prefer a standalone app with no Node/Bun? Grab the **portable zip** (`Clauddy-<version>-win.zip`) from the [latest release](https://github.com/renatoaug/claude-usage-monitor/releases), unzip it anywhere, and run `Clauddy.exe`. Because the app is unsigned, Windows **SmartScreen** shows a "Windows protected your PC" prompt the first time — click **More info → Run anyway**. From then on it starts with Windows.
+Prefere um app independente sem Node/Bun? Pegue o **zip portátil** (`Clauddy-<versão>-win.zip`) na [última release](https://github.com/renatoaug/claude-usage-monitor/releases), descompacte em qualquer lugar, e rode `Clauddy.exe`. Como o app não é assinado, o **SmartScreen** do Windows mostra um aviso de "O Windows protegeu seu PC" na primeira vez — clique em **Mais informações → Executar assim mesmo**. Depois disso ele inicia junto com o Windows.
 
-> Windows builds are produced by the **Build** workflow (Actions ▸ Build) — attaching them to every release automatically is on the roadmap.
+> Os builds do Windows são gerados pelo workflow **Build** (Actions ▸ Build) — anexá-los automaticamente a cada release está no roteiro.
 
 ### Linux (x64)
 
-The quickest path works the same as macOS — with [Bun](https://bun.sh) or Node 24 installed:
+O caminho mais rápido funciona igual ao macOS — com [Bun](https://bun.sh) ou Node 24 instalado:
 
 ```bash
-bunx clauddy   # or: npx clauddy
+bunx clauddy   # ou: npx clauddy
 ```
 
-Prefer a standalone app? Grab the **AppImage** or **tar.gz** (`Clauddy-<version>.AppImage` / `clauddy-<version>.tar.gz`) from the [latest release](https://github.com/renatoaug/claude-usage-monitor/releases), then:
+Prefere um app independente? Pegue o **AppImage** ou **tar.gz** (`Clauddy-<versão>.AppImage` / `clauddy-<versão>.tar.gz`) na [última release](https://github.com/renatoaug/claude-usage-monitor/releases), depois:
 
 ```bash
 chmod +x Clauddy-*.AppImage
 ./Clauddy-*.AppImage
 ```
 
-> Linux builds are produced by the **Build** workflow (Actions ▸ Build) — attaching them to every release automatically is on the roadmap.
+> Os builds do Linux são gerados pelo workflow **Build** (Actions ▸ Build) — anexá-los automaticamente a cada release está no roteiro.
 
-> The system tray icon needs an indicator extension on vanilla GNOME (e.g. "AppIndicator and KStatusNotifier Item Support") — it works out of the box on Cinnamon, KDE, and XFCE. Autostart-at-login is wired up via an XDG `.desktop` entry in `~/.config/autostart/`.
+> O ícone da bandeja do sistema precisa de uma extensão de indicador no GNOME padrão (ex.: "AppIndicator and KStatusNotifier Item Support") — funciona nativamente no Cinnamon, KDE e XFCE. O início automático no login é feito via uma entrada `.desktop` do XDG em `~/.config/autostart/`.
 
-> The app keeps its data in `~/.claude-usage-monitor`, regardless of platform or how you run it.
+> O app guarda seus dados em `~/.claude-usage-monitor`, independente da plataforma ou de como você o executa.
 
-## Controls
+## Controles
 
-- **Drag** the widget anywhere on screen
-- **–** minimizes to just the pet's face (showing the live session %); the **⤢** button or a double-click on the pet expands it back
-- **⚙** opens settings (log in, toggle alerts, set thresholds, pick the display mode)
-- **↗** opens the official Usage page
-- **×** quits
+- **Arraste** o widget pra qualquer lugar da tela
+- **–** minimiza só pro rosto do bichinho (mostrando a % de sessão ao vivo); o botão **⤢** ou um clique duplo no bichinho expande de volta
+- **⚙** abre as configurações (login, ativar alertas, definir limites, escolher o modo de exibição)
+- **↗** abre a página oficial de Uso
+- **×** fecha
 
-### Floating or menu bar
+### Flutuante ou barra de menu
 
-Under **⚙ Settings → Display** you can pick where Clauddy lives:
+Em **⚙ Configurações → Exibição** você pode escolher onde o Clauddy vive:
 
-- **Floating pet** — the always-on widget in the corner (default).
-- **Menu bar** — a small pet icon in the macOS menu bar showing your live session **%** (it turns 🔥 near your limit). Click it to pop open the full pet + usage panel; click away to dismiss. Right-click for a quick menu.
+- **Bichinho flutuante** — o widget sempre visível no canto (padrão).
+- **Barra de menu** — um pequeno ícone do bichinho na barra de menu do macOS mostrando sua % de sessão ao vivo (fica 🔥 perto do limite). Clique nele pra abrir o painel completo do bichinho + uso; clique fora pra fechar. Clique com o botão direito pra um menu rápido.
 
-Switching is instant — no restart. (On Windows/Linux the icon lives in the system tray; the live % shows in its tooltip.)
+A troca é instantânea — sem reiniciar. (No Windows/Linux o ícone fica na bandeja do sistema; a % ao vivo aparece na dica de ferramenta.)
 
-## Alerts
+## Alertas
 
-Optional **macOS notifications** when your session or weekly usage crosses the thresholds you set (default **80%** and **95%**) — e.g. _"Your session is over 80% — now at 82%"_. They re-arm automatically once usage drops back below a threshold (after a reset). Toggle them and edit the thresholds in **⚙ Settings**.
+**Notificações do macOS** opcionais quando sua sessão ou uso semanal ultrapassa os limites que você definir (padrão **80%** e **95%**) — ex.: _"Sua sessão passou de 80% — agora em 82%"_. Elas se rearmam automaticamente quando o uso volta abaixo de um limite (depois de um reinício). Ative/desative e edite os limites em **⚙ Configurações**.
 
-## Configure (`config.json`)
+## Configurar (`config.json`)
 
-Settings saved from the UI live in `~/.claude-usage-monitor/config.json`, so you can tweak them without rebuilding:
+As configurações salvas pela interface ficam em `~/.claude-usage-monitor/config.json`, então dá pra ajustá-las sem recompilar:
 
 ```jsonc
 {
-  "mode": "floating", // "floating" pet in the corner, or "menubar" popover
-  "alerts": true, // macOS notifications on/off
-  "alertThresholds": [80, 95], // notify when session/week cross these % (two levels)
-  "fireThreshold": 90, // session % at which the pet catches fire (maxed out stays 100)
-  "pollIntervalMs": 4000, // how often local logs are re-read
-  "activeThresholdMs": 20000, // "active" if Claude wrote to its logs within this window
-  "sleepThresholdMs": 300000, // "sleeping" after this much idle time (5 min)
+  "mode": "floating", // bichinho "floating" no canto, ou popover "menubar"
+  "language": "pt", // "pt" ou "en" — idioma da interface
+  "alerts": true, // notificações do macOS ligadas/desligadas
+  "alertThresholds": [80, 95], // avisa quando sessão/semana passam desses % (dois níveis)
+  "fireThreshold": 90, // % de sessão em que o bichinho pega fogo (no limite fica travado em 100)
+  "pollIntervalMs": 4000, // com que frequência os logs locais são relidos
+  "activeThresholdMs": 20000, // "ativo" se o Claude escreveu nos logs dentro dessa janela
+  "sleepThresholdMs": 300000, // "dormindo" depois desse tempo ocioso (5 min)
 }
 ```
 
-## Play with the pet
+## Brinque com o bichinho
 
-With the widget running, poke it from the terminal — just for fun:
+Com o widget rodando, cutuque ele pelo terminal — só por diversão:
 
 ```bash
-bunx clauddy poke        # 💕 squish + hearts
-bunx clauddy celebrate   # 🎉 jump + confetti
-bunx clauddy fire        # 🔥 on fire
-bunx clauddy sleeping    # 😴 blue zzz
-bunx clauddy working     # 🍴 eats token coins
-bunx clauddy tired       # 🥵 maxed out
-bunx clauddy idle        # 🙂 calm
-bunx clauddy auto        # ↩️ back to your real usage
+bunx clauddy poke        # 💕 se espreme + corações
+bunx clauddy celebrate   # 🎉 pula + confete
+bunx clauddy fire        # 🔥 pega fogo
+bunx clauddy sleeping    # 😴 zzz azul
+bunx clauddy working     # 🍴 come moedas de token
+bunx clauddy tired       # 🥵 no limite
+bunx clauddy idle        # 🙂 calmo
+bunx clauddy auto        # ↩️ volta pro seu uso real
 ```
 
-Each state is written to the data dir the running widget watches, so it reacts
-live. (Installed globally? Drop the `bunx`: `clauddy poke`. Working on the repo?
-`./pet <state>` does the same.)
+Cada estado é escrito na pasta de dados que o widget em execução observa, então
+ele reage ao vivo. (Instalado globalmente? Tire o `bunx`: `clauddy poke`.
+Trabalhando no repositório? `./pet <estado>` faz o mesmo.)
 
-## How it works
+## Como funciona
 
-- **`main.js`** — Electron main process: frameless, transparent, always-on-top window; polls usage; fires macOS notifications; watches `config.json` and `debug.json`.
-- **`usage.js`** — reads `~/.claude/projects/**/*.jsonl`, sums tokens per model/day, detects the rolling 5-hour session window, the working/sleeping status, and which activity (reading/editing/running/…) Claude is on from its latest tool use.
-- **`auth.js`** — OAuth login (PKCE, same public client as Claude Code) that fetches the authoritative usage %. Token stored locally, never committed.
-- **`renderer/`** — the pet itself: an SVG pixel sprite, CSS animations, and the Web Animations API for particles.
-- **`make-icon.js`** — generates the app icon from the pixel sprite (`build/icon.icns`).
+- **`main.js`** — processo principal do Electron: janela sem moldura, transparente, sempre no topo; consulta o uso; dispara notificações do macOS; observa `config.json` e `debug.json`.
+- **`usage.js`** — lê `~/.claude/projects/**/*.jsonl`, soma tokens por modelo/dia, detecta a janela móvel de 5 horas da sessão, o status de trabalhando/dormindo, e qual atividade (lendo/editando/executando/…) o Claude está fazendo a partir do último uso de ferramenta.
+- **`auth.js`** — login OAuth (PKCE, mesmo cliente público do Claude Code) que busca a % real de uso. Token guardado localmente, nunca commitado.
+- **`i18n-strings.js`** — dicionário único de textos (EN/PT) usado tanto pelo processo principal (bandeja, notificações) quanto pela interface.
+- **`renderer/`** — o bichinho em si: um sprite pixel-art em SVG, animações CSS, e a Web Animations API pras partículas.
+- **`make-icon.js`** — gera o ícone do app a partir do sprite pixel-art (`build/icon.icns`).
 
-## Data & privacy
+## Dados e privacidade
 
-Everything lives on your machine, in `~/.claude-usage-monitor/`:
+Tudo fica na sua máquina, em `~/.claude-usage-monitor/`:
 
-- `auth.json` — your OAuth token (file mode `600`, never committed)
-- `config.json` — your alert settings
-- `debug.json` — scratch file for the `./pet` simulator
+- `auth.json` — seu token OAuth (permissão de arquivo `600`, nunca commitado)
+- `config.json` — suas configurações de alerta
+- `debug.json` — arquivo de rascunho pro simulador `./pet`
 
-Nothing leaves your machine except the OAuth calls to Anthropic's own login and usage endpoints.
+Nada sai da sua máquina, exceto as chamadas OAuth pros próprios endpoints de login e uso da Anthropic.
 
-## Dev tooling
+## Ferramentas de desenvolvimento
 
-- **Bun** for install/scripts, **Node 24** pinned in `.nvmrc`
-- **Biome** for format + lint (`bun run check`); a versioned **pre-commit hook** (`.githooks/pre-commit`) auto-formats staged files and blocks on errors. It's wired up automatically on `bun install` (via the `prepare` script).
+- **Bun** pra instalação/scripts, **Node 24** fixado em `.nvmrc`
+- **Biome** pra formatação + lint (`bun run check`); um **pre-commit hook** versionado (`.githooks/pre-commit`) formata automaticamente os arquivos staged e bloqueia em caso de erro. É configurado automaticamente no `bun install` (via o script `prepare`).
 
-### Releasing
+### Releases
 
-Releases are **fully automated**. Every push to `main` runs
+Releases são **totalmente automatizadas**. Todo push pro `main` roda o
 [semantic-release](https://semantic-release.gitbook.io) (`.github/workflows/release.yml`):
-it reads the **Conventional Commits** and, when there's something to ship,
-computes the version, builds the macOS app, publishes `clauddy` to npm, and
-cuts a GitHub Release with the `.app` zip. Nothing to do by hand — just merge
-your PRs.
+ele lê os **Conventional Commits** e, quando há algo pra lançar,
+calcula a versão, compila o app macOS, publica `clauddy` no npm, e
+gera uma Release do GitHub com o zip do `.app`. Nada pra fazer manualmente — só
+dar merge nos PRs.
 
 - `feat:` → minor, `fix:` → patch, `feat!:`/`BREAKING CHANGE` → major.
-- `docs:`/`chore:`/`ci:` etc. don't trigger a release.
+- `docs:`/`chore:`/`ci:` etc. não disparam uma release.
