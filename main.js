@@ -17,6 +17,18 @@ const { getUsage } = require('./usage')
 const auth = require('./auth')
 const STRINGS = require('./i18n-strings.js')
 
+// single instance: without this, nothing stops the user from double-clicking
+// the .exe/.app twice (or `bunx clauddy` in two terminals) and ending up with
+// several Clauddy processes fighting over the same tray icon / config file.
+// Must run before any other app.* call — the losing process quits here, on
+// the spot, before creating a window or touching config/tray.
+const gotSingleInstanceLock = app.requestSingleInstanceLock()
+if (!gotSingleInstanceLock) {
+  // called before the app is 'ready', so quit() cancels startup outright —
+  // whenReady() below never resolves in this process, no window gets made.
+  app.quit()
+}
+
 const REPO = 'renatoaug/claude-usage-monitor'
 
 // simple {var} substitution against the string dict for the app's current
@@ -522,6 +534,21 @@ function enableLinuxAutostart() {
   fs.mkdirSync(autostartDir, { recursive: true })
   fs.writeFileSync(desktopFile, entry)
 }
+
+// a second launch attempt (double-click, `bunx clauddy` again…) lands here
+// instead of opening its own window — just bring the real one forward.
+app.on('second-instance', () => {
+  if (!win || win.isDestroyed()) return
+  if (currentMode === 'menubar') {
+    showPopover()
+  } else {
+    if (!win.isVisible()) {
+      positionFloating()
+      win.show()
+    }
+    win.focus()
+  }
+})
 
 app.whenReady().then(() => {
   // Windows toast notifications need an explicit AppUserModelID to show reliably
